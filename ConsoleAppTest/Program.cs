@@ -153,7 +153,7 @@ public class Program
                         Login();
                         break;
                     case 3:
-                        if (User.Any())
+                        if (User.Count!=0)
                             foreach (var item in User)
                                 Console.WriteLine($"邮箱:{item.Email},用户名:{item.Username},密码:{item.Password}");
                         if (User.Count == 0)
