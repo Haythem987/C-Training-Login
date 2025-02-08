@@ -2,86 +2,125 @@
 
 public class Program
 {
-    public static List<Useritem> User = new();
+    private static readonly List<UserItem> User = [];
 
 
-    public static void Register()
+    private static void Register()
     {
-        Console.WriteLine("请输入用户名");
-        var username = Console.ReadLine();
-        if (username == "")
-        {
-            Console.WriteLine("输入内容为空，请重新输入");
-            Register();
-        }
-
-        Console.WriteLine("请输入密码");
-        var password = Console.ReadLine();
-        if (password == "")
-        {
-            Console.WriteLine("输入内容为空，请重新输入");
-            Register();
-        }
-
-        Console.WriteLine("请输入邮箱");
-        var email = Console.ReadLine();
-        if (email == "")
-        {
-            Console.WriteLine("输入内容为空，请重新输入");
-            Register();
-        }
-
-        if (User.Any(x => x.Email == email))
-        {
-            Console.WriteLine("SB你注册过了");
-        }
-        else
-        {
-            User.Add(new Useritem { Username = username, Password = password, Email = email });
-            Console.WriteLine("注册成功");
-        }
-    }
-
-    public static void Login()
-    {
-        if (!User.Any())
-        {
-            Console.WriteLine("未有用户注册过");
-        }
-        else
+        var email = "";
+        var username = "";
+        var password = "";
+        
+        var emailed = false;
+        while (emailed == false)
         {
             Console.WriteLine("请输入邮箱");
-            var email = Console.ReadLine();
-            if (email == "")
+            email = Console.ReadLine();
+            if (string.IsNullOrEmpty(email))
             {
-                Console.WriteLine("输入内容为空，请重新输入");
-                Login();
+                Console.WriteLine("输入邮箱为空，请重新输入");
+                continue;
             }
 
+            if (User.Any(x => x.Email == email))
+            {
+                Console.WriteLine("您注册过了");
+                break;
+            }
+
+            emailed = true;
+        }
+
+        var usernamed = false;
+        while (usernamed == false)
+        {
+            Console.WriteLine("请输入用户名");
+            username = Console.ReadLine();
+            if (string.IsNullOrEmpty(username))
+            {
+                Console.WriteLine("输入用户名为空，请重新输入");
+                continue;
+            }
+
+            usernamed = true;
+        }
+
+        var passworded = false;
+        while (passworded == false)
+        {
             Console.WriteLine("请输入密码");
-            var password = Console.ReadLine();
-            if (password == "")
+            password = Console.ReadLine();
+            if (string.IsNullOrEmpty(password))
             {
-                Console.WriteLine("输入内容为空，请重新输入");
-                Login();
+                Console.WriteLine("输入密码为空，请重新输入");
+                continue;
             }
 
-            if (User.Any(x => x.Username == email && x.Password == password))
+            passworded = true;
+        }
+
+        User.Add(new UserItem { Username = username, Password = password, Email = email });
+        Console.WriteLine("注册成功");
+    }
+
+    private static void Login()
+
+    {
+        if (User.Count == 0)
+        {
+            Console.WriteLine("未有用户注册过，请先注册");
+            Register();
+        }
+        else
+        {
+            var email = "";
+            var validEmail = false;
+
+            while (!validEmail)
+
             {
-                var userinfo = User.FirstOrDefault(x => x.Email == email && x.Password == password);
-                Console.WriteLine($"登陆成功，{userinfo.Username}");
+                Console.WriteLine("请输入邮箱");
+                email = Console.ReadLine();
+                if (string.IsNullOrEmpty(email))
+                {
+                    Console.WriteLine("输入邮箱为空，请重新输入");
+                    continue;
+                }
+
+                if (!User.Any(x => x.Email == email))
+                {
+                    Console.WriteLine("此邮箱不存在，请重新输入邮箱");
+                    continue;
+                }
+
+                validEmail = true;
             }
-            else if (User.Any(x => x.Username == email && x.Password != password))
+
+            var PasswordCorrect = false;
+
+
+            while (!PasswordCorrect)
             {
-                Console.WriteLine("密码错误");
-            }
-            else if (User.Any(x => x.Email != email))
-            {
-                Console.WriteLine("邮箱错误");
-            }
-            else
-            {
-                Console.WriteLine("无此用户");
+                Console.WriteLine("请输入密码");
+                var password = Console.ReadLine();
+                if (string.IsNullOrEmpty(password))
+                {
+                    Console.WriteLine("输入密码为空，请重新输入");
+                    continue;
+                }
+
+                if (User.Any(x => x.Email == email && x.Password != password))
+                {
+                    Console.WriteLine("密码错误，请重新输入密码");
+                    continue;
+                }
+
+                if (User.Any(x => x.Email == email && x.Password == password))
+                {
+                    var userinfo = User.FirstOrDefault(x => x.Email == email && x.Password == password);
+                    Console.WriteLine($"登陆成功，{userinfo.Username}");
+                    PasswordCorrect = true;
+                }
             }
         }
     }
@@ -101,7 +140,7 @@ public class Program
                 var inputnum = Convert.ToInt32(input);
                 if (inputnum is 0 or > 4)
                 {
-                    Console.WriteLine("请输入在1-4之间的整数");
+                    Console.WriteLine("请输入范围在1-4之间的整数");
                     continue;
                 }
 
@@ -114,9 +153,13 @@ public class Program
                         Login();
                         break;
                     case 3:
-                        foreach (var item in User)
-                            Console.WriteLine($"用户名:{item.Username},密码:{item.Password},邮箱:{item.Email}");
+                        if (User.Any())
+                            foreach (var item in User)
+                                Console.WriteLine($"邮箱:{item.Email},用户名:{item.Username},密码:{item.Password}");
+                        if (User.Count == 0)
+                            Console.WriteLine("无用户信息");
                         break;
+
                     case 4:
                         Console.WriteLine("再见");
                         Environment.Exit(0);
@@ -126,15 +169,15 @@ public class Program
 
             catch
             {
-                Console.WriteLine("你在输毛");
+                Console.WriteLine("请输入范围在1-4之间的整数");
             }
         }
-        }
+    }
 
-    public class Useritem
+    private class UserItem
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Email { get; set; }
+        public required string Username { get; set; }
+        public required string Password { get; set; }
+        public required string Email { get; set; }
     }
 }
