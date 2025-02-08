@@ -25,7 +25,7 @@ public class Program
             if (User.Any(x => x.Email == email))
             {
                 Console.WriteLine("您注册过了");
-                break;
+                return;
             }
 
             emailed = true;
